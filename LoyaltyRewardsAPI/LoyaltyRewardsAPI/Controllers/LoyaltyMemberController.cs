@@ -1,10 +1,7 @@
 ﻿using LoyaltyRewardsAPI.Data;
 using LoyaltyRewardsAPI.Data.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
-using System.Xml.Linq;
 
 namespace LoyaltyRewardsAPI.Controllers {
     [ApiController]
@@ -67,8 +64,8 @@ namespace LoyaltyRewardsAPI.Controllers {
             return Ok("Member deleted successfully");
         }
 
-        [HttpGet("list")]
-        public async Task<IActionResult> Search(string query) {
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchMembers(string query) {
             query = query.Trim().ToUpper();
             string[] tokens = query.Split(" ");
 
@@ -87,9 +84,10 @@ namespace LoyaltyRewardsAPI.Controllers {
             }
             return Ok(matchingMembers);
         }
-        [HttpGet("list/{page}")]
-        public async Task<IActionResult> Search(int page, int entryCount) {
-            return Ok();
+
+        [HttpGet("list")]
+        public async Task<IActionResult> ListMembers() {
+            return Ok(await db.Members.ToListAsync());
         }
     }
 }
