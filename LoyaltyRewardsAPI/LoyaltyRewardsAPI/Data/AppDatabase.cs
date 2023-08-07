@@ -37,7 +37,7 @@ namespace LoyaltyRewardsAPI.Data {
             modelBuilder.Entity<Member>().HasData(members);
 
             List<Transaction> transactions = new List<Transaction> {
-                new Transaction { Id = 1, MemberId = matthew.Id, Date = "", PointsEarned = 10 }
+                new Transaction { Id = 1, MemberId = matthew.Id, Date = DateTime.UtcNow.Ticks, PointsEarned = 10 }
             };
 
             modelBuilder.Entity<Transaction>().HasData(transactions);
