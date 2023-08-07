@@ -1,18 +1,13 @@
-import { React, useState, useEffect } from 'react'
+import { React, useState, useEffect } from 'react';
+import { Button, Modal } from 'bootstrap';
+import MemberModal from '../components/MemberModal';
+import MemberRow from '../components/MemberRow';
+
 import axios from 'axios';
-import MainLayout from '../layouts/MainLayout'
 
-const Row = (props) => {
-  const { name, email, points } = props;
 
-  return (
-    <tr>
-      <td>{name}</td>
-      <td>{email}</td>
-      <td>{points}</td>
-    </tr>
-  )
-}
+import MainLayout from '../layouts/MainLayout';
+import SearchBar from '../components/SearchBar';
 
 const Table = (props) => {
   const { data } = props;
@@ -35,7 +30,7 @@ const Table = (props) => {
       </thead>
       <tbody>
         {data.map(row =>
-          <Row key={row['id']} name={getName(row['firstName'], row['lastName'])} email={row['email']} points={row['points']} />
+          <MemberRow key={row['id']} id={row['id']} name={getName(row['firstName'], row['lastName'])} email={row['email']} points={row['points']} />
         )}
       </tbody>
     </table>
@@ -68,8 +63,7 @@ const PageNav = (props) => {
   )
 }
 
-export default function SearchPage(props) {
-
+export default function SearchPage() {
   const [query, setQuery] = useState(null);
   const [members, setMembers] = useState([]);
   const [page, setPage] = useState(0);
@@ -119,10 +113,7 @@ export default function SearchPage(props) {
 
   return (
     <MainLayout>
-      <form className="d-flex" role="search" onSubmit={search}>
-        <input id='search' className="form-control me-2 form-control-lg" type="search" placeholder="Search" onChange={event => setQuery(event.target.value)} aria-label="Search" />
-        <button className="btn btn-outline-success btn-lg" type="submit">Search</button>
-      </form>
+      <SearchBar search={search} setQuery={setQuery}></SearchBar>
       <div className='mt-3 p-2 bg-dark rounded' onLoad={search}>
         <Table data={members} />
         <PageNav page={page} maxPage={maxPage} changePage={changePage} />
