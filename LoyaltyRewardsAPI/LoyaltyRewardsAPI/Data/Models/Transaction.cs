@@ -9,6 +9,7 @@ namespace LoyaltyRewardsAPI.Data.Models {
 
         [Required]
         public int MemberId { get; set; }
+        public Member Member { get; set; } = null!;
 
         public string Date { get; set; } = null!;
 

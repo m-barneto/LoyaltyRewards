@@ -30,7 +30,7 @@ namespace LoyaltyRewardsAPI.Controllers {
             if (updatedTransaction.PointsEarned.HasValue) {
                 int diff = updatedTransaction.PointsEarned.Value - transaction.PointsEarned;
                 // Find member
-                Member? member = await db.Members.FindAsync(transaction.MemberId);
+                Member? member = await db.Members.FindAsync(transaction.Member.Id);
                 if (member == null) {
                     return StatusCode(500, "No member found with associated transaction!");
                 }
