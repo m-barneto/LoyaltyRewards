@@ -10,6 +10,7 @@ namespace LoyaltyRewardsAPI.Data {
         public AppDatabase(DbContextOptions<AppDatabase> options) : base(options) { }
 
         public DbSet<Member> Members => Set<Member>();
+        public DbSet<Transaction> Transactions => Set<Transaction>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder options) {
             options.UseSqlite(options => {
@@ -20,6 +21,7 @@ namespace LoyaltyRewardsAPI.Data {
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.Entity<Member>().ToTable("Members");
+            modelBuilder.Entity<Transaction>().ToTable("Transasctions");
 
 
             List<Member> members = new List<Member> {
@@ -29,6 +31,10 @@ namespace LoyaltyRewardsAPI.Data {
                 new Member { Id = 4, FirstName = "Jeff", LastName = "Hayes", Email = "hfdij@giasndc.com" }
             };
             modelBuilder.Entity<Member>().HasData(members);
+
+            List<Transaction> transactions = new List<Transaction> {
+                new Transaction { Id = 1,  }
+            };
 
             /*
             modelBuilder.Entity<InviteModel>().ToTable("Invites", "test");

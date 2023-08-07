@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.Extensions.Hosting;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LoyaltyRewardsAPI.Data.Models {
@@ -23,6 +24,8 @@ namespace LoyaltyRewardsAPI.Data.Models {
         public long LastUpdatedTime { get; set; }
 
         public long AccountCreateTime { get; set; }
+
+        public ICollection<Transaction> Transactions { get; }
 
         override public string ToString() {
             return $"{Id} : {Email}\n{AccountCreateTime} - {LastUpdatedTime}";
