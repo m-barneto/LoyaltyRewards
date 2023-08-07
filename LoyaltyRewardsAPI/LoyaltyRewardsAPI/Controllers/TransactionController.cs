@@ -11,7 +11,22 @@ namespace LoyaltyRewardsAPI.Controllers {
 
         [HttpPost("{transactionId}")]
         public async Task<IActionResult> CreateTransaction(int transactionId, [FromBody] Transaction transaction) {
-            return Ok();
+            if (ModelState.IsValid) {
+                Member? member = await db.Members.FindAsync(transaction.MemberId);
+                if (member == null) {
+                    return BadRequest("No member found with associated member.");
+                }
+                transaction.Date = DateTime.UtcNow.Ticks;
+                transaction.PointsEarned = transaction.PointsEarned;
+
+                member.Points += transaction.PointsEarned;
+                db.Update(member);
+                await db.Transactions.AddAsync(transaction);
+                await db.SaveChangesAsync();
+                return Ok(transaction);
+            } else {
+                return BadRequest(ModelState);
+            }
         }
 
         [HttpGet("{transactionId}")]
@@ -26,7 +41,7 @@ namespace LoyaltyRewardsAPI.Controllers {
                 return NotFound("No transaction with that ID found.");
             }
 
-            if (!string.IsNullOrWhiteSpace(updatedTransaction.Date)) transaction.Date = updatedTransaction.Date;
+            if (updatedTransaction.Date.HasValue) transaction.Date = updatedTransaction.Date.Value;
             if (updatedTransaction.PointsEarned.HasValue) {
                 int diff = updatedTransaction.PointsEarned.Value - transaction.PointsEarned;
                 // Find member
@@ -34,8 +49,9 @@ namespace LoyaltyRewardsAPI.Controllers {
                 if (member == null) {
                     return StatusCode(500, "No member found with associated transaction!");
                 }
-                // Update member points here???
 
+                member.Points += diff;
+                db.Members.Update(member);
 
                 transaction.PointsEarned = updatedTransaction.PointsEarned.Value;
 
@@ -49,7 +65,18 @@ namespace LoyaltyRewardsAPI.Controllers {
 
         [HttpDelete("{transactionId}")]
         public async Task<IActionResult> DeleteTransaction(int transactionId) {
-            return Ok();
+            Transaction? transaction = await db.Transactions.FindAsync(transactionId);
+            if (transaction == null) {
+                return NotFound("No transaction with that ID found.");
+            }
+
+            Member member = transaction.Member;
+            member.Points -= transaction.PointsEarned;
+            db.Update(member);
+
+            db.Transactions.Remove(transaction);
+            await db.SaveChangesAsync();
+            return Ok("Transaction deleted successfully");
         }
     }
 }

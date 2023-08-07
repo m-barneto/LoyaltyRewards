@@ -11,7 +11,7 @@ namespace LoyaltyRewardsAPI.Data.Models {
         public int MemberId { get; set; }
         public Member Member { get; set; } = null!;
 
-        public string Date { get; set; } = null!;
+        public long Date { get; set; } = null!;
 
         public int PointsEarned { get; set; }
     }
