@@ -64,11 +64,30 @@ namespace LoyaltyRewardsAPI.Controllers {
             return Ok("Member deleted successfully");
         }
 
+
+        private Tuple<int, List<Member>>? PaginateList(List<Member> members, int page, int entries, bool isList = false) {
+            int allowedPages = members.Count / entries + (members.Count % entries > 0 ? 1 : 0);
+            if (page >= allowedPages) {
+                return null;
+            }
+
+            Tuple<int, List<Member>> results = new Tuple<int, List<Member>>(isList ? 3 : allowedPages, new List<Member>());
+
+            int startIndex = page * entries;
+            int endIndex = startIndex + entries;
+            if (endIndex <= members.Count) {
+                results.Item2.AddRange(members.GetRange(page * entries, entries));
+            } else {
+                results.Item2.AddRange(members.GetRange(startIndex, members.Count - startIndex));
+            }
+
+            return results;
+        }
+
         [HttpGet("search")]
-        public async Task<IActionResult> SearchMembers(string query) {
+        public async Task<IActionResult> SearchMembers(int page, int entries, string query) {
             query = query.Trim().ToUpper();
             string[] tokens = query.Split(" ");
-
             List<Member> matchingMembers = new List<Member>();
 
             for (int i = 0; i < tokens.Length && i < 5; i++) {
@@ -82,12 +101,22 @@ namespace LoyaltyRewardsAPI.Controllers {
             if (matchingMembers.Count == 0) {
                 return NotFound("No users found matching the search criteria.");
             }
-            return Ok(matchingMembers);
+
+            Tuple<int, List<Member>>? results = PaginateList(matchingMembers, page, entries);
+            if (results == null) {
+                return BadRequest("Page index out of bounds.");
+            }
+
+            return Ok(results);
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> ListMembers() {
-            return Ok(await db.Members.ToListAsync());
+        public async Task<IActionResult> ListMembers(int page, int entries) {
+            Tuple<int, List<Member>>? results = PaginateList(await db.Members.OrderByDescending(u => u.Points).Take(entries * (page + 1)).ToListAsync(), page, entries, true);
+            if (results == null) {
+                return BadRequest("Page index out of bounds.");
+            }
+            return Ok(results);
         }
     }
 }

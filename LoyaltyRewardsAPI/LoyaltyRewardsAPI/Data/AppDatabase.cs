@@ -22,11 +22,12 @@ namespace LoyaltyRewardsAPI.Data {
             modelBuilder.Entity<Member>().ToTable("Members");
 
 
-            List<Member> members = new List<Member>();
-            members.Add(new Member { Id = 1, FirstName = "Matthew", LastName = "Barneto", Email = "asdasdsa@giasndc.com" });
-            members.Add(new Member { Id = 2, FirstName = "Nicholas", LastName = "Cage", Email = "5435@123.com" });
-            members.Add(new Member { Id = 3, FirstName = "Lucas", LastName = "Van", Email = "van@giasndc.com" });
-            members.Add(new Member { Id = 4, FirstName = "Jeff", LastName = "Hayes", Email = "hfdij@giasndc.com" });
+            List<Member> members = new List<Member> {
+                new Member { Id = 1, FirstName = "Matthew", LastName = "Barneto", Email = "asdasdsa@giasndc.com" },
+                new Member { Id = 2, FirstName = "Nicholas", LastName = "Cage", Email = "5435@123.com" },
+                new Member { Id = 3, FirstName = "Lucas", LastName = "Van", Email = "van@giasndc.com" },
+                new Member { Id = 4, FirstName = "Jeff", LastName = "Hayes", Email = "hfdij@giasndc.com" }
+            };
             modelBuilder.Entity<Member>().HasData(members);
 
             /*

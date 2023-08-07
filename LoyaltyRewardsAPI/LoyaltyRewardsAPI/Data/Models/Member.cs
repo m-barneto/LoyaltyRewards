@@ -14,6 +14,10 @@ namespace LoyaltyRewardsAPI.Data.Models {
 
         public string Email { get; set; } = string.Empty;
 
+        public string Meta { get; set; } = string.Empty;
+
+        public string BirthdayMonth { get; set; } = string.Empty;
+
         public int Points { get; set; }
 
         public long LastUpdatedTime { get; set; }

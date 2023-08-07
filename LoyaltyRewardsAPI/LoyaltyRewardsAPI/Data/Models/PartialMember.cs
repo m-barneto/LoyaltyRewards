@@ -9,6 +9,10 @@ namespace LoyaltyRewardsAPI.Data.Models {
 
         public string? Email { get; set; }
 
+        public string? Meta { get; set; }
+
+        public string? BirthdayMonth { get; set; }
+
         public int? Points { get; set; }
     }
 }
