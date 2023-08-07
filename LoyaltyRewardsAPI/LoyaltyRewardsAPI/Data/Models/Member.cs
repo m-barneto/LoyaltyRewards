@@ -25,8 +25,6 @@ namespace LoyaltyRewardsAPI.Data.Models {
 
         public long AccountCreateTime { get; set; }
 
-        public ICollection<Transaction> Transactions { get; }
-
         override public string ToString() {
             return $"{Id} : {Email}\n{AccountCreateTime} - {LastUpdatedTime}";
         }

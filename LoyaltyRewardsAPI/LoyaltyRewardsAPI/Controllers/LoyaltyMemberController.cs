@@ -118,5 +118,14 @@ namespace LoyaltyRewardsAPI.Controllers {
             }
             return Ok(results);
         }
+
+        [HttpGet("{memberId}/transactions")]
+        public async Task<IActionResult> GetAllTransactions(int memberId) {
+            Member? member = await db.Members.FindAsync(memberId);
+            if (member == null) {
+                return NotFound("Member not found.");
+            }
+            return Ok(await db.Transactions.Where(x => x.MemberId == member.Id).ToListAsync());
+        }
     }
 }

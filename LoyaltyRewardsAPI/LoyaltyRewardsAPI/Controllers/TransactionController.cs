@@ -28,14 +28,5 @@ namespace LoyaltyRewardsAPI.Controllers {
         public async Task<IActionResult> DeleteTransaction(int transactionId) {
             return Ok();
         }
-
-        [HttpGet("member/{id}")]
-        public async Task<IActionResult> GetAllTransactions(int memberId) {
-            Member? member = await db.Members.FindAsync(memberId);
-            if (member == null) {
-                return NotFound("Member not found.");
-            }
-            return Ok(member.Transactions.ToList());
-        }
     }
 }

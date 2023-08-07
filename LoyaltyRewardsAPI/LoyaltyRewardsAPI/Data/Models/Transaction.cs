@@ -8,10 +8,10 @@ namespace LoyaltyRewardsAPI.Data.Models {
         public int Id { get; set; }
 
         [Required]
-        public Member Member { get; set; }
+        public int MemberId { get; set; }
 
-        public string Date { get; set; }
+        public string Date { get; set; } = null!;
 
-        public string PointsEarned { get; set; }
+        public int PointsEarned { get; set; }
     }
 }

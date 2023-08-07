@@ -20,12 +20,13 @@ namespace LoyaltyRewardsAPI.Data {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Member>().ToTable("Members");
-            modelBuilder.Entity<Transaction>().ToTable("Transasctions");
+            modelBuilder.Entity<Transaction>().ToTable("Transactions");
 
-
+            Member matthew = new Member { Id = 1, FirstName = "Matthew", LastName = "Barneto", Email = "asdasdsa@giasndc.com" };
             List<Member> members = new List<Member> {
-                new Member { Id = 1, FirstName = "Matthew", LastName = "Barneto", Email = "asdasdsa@giasndc.com" },
+                matthew,
                 new Member { Id = 2, FirstName = "Nicholas", LastName = "Cage", Email = "5435@123.com" },
                 new Member { Id = 3, FirstName = "Lucas", LastName = "Van", Email = "van@giasndc.com" },
                 new Member { Id = 4, FirstName = "Jeff", LastName = "Hayes", Email = "hfdij@giasndc.com" }
@@ -33,8 +34,10 @@ namespace LoyaltyRewardsAPI.Data {
             modelBuilder.Entity<Member>().HasData(members);
 
             List<Transaction> transactions = new List<Transaction> {
-                new Transaction { Id = 1,  }
+                new Transaction { Id = 1, MemberId = matthew.Id, Date = "", PointsEarned = 10 }
             };
+
+            modelBuilder.Entity<Transaction>().HasData(transactions);
 
             /*
             modelBuilder.Entity<InviteModel>().ToTable("Invites", "test");
@@ -51,8 +54,6 @@ namespace LoyaltyRewardsAPI.Data {
             }
             modelBuilder.Entity<InviteModel>().HasData(invites);
              */
-
-            base.OnModelCreating(modelBuilder);
         }
     }
 }
