@@ -119,7 +119,7 @@ namespace LoyaltyRewardsAPI.Controllers {
             return Ok(results);
         }
 
-        [HttpGet("{memberId}/transactions")]
+        [HttpGet("transactions")]
         public async Task<IActionResult> GetAllTransactions(int memberId) {
             return Ok(await db.Transactions.Where(x => x.Member.Id == memberId).ToListAsync());
         }

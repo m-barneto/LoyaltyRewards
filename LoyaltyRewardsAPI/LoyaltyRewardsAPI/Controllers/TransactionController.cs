@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Metrics;
 
 namespace LoyaltyRewardsAPI.Controllers {
+    [ApiController]
+    [Route("[controller]")]
     public class TransactionController : ControllerBase {
         private readonly AppDatabase db;
         private readonly IConfiguration config;

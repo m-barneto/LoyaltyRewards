@@ -1,6 +1,4 @@
 import { React, useState, useEffect } from 'react';
-import { Button, Modal } from 'bootstrap';
-import MemberModal from '../components/MemberModal';
 import MemberRow from '../components/MemberRow';
 
 import axios from 'axios';
@@ -11,13 +9,6 @@ import SearchBar from '../components/SearchBar';
 
 const Table = (props) => {
   const { data } = props;
-
-  function getName(firstName, lastName) {
-    if (lastName == null) {
-      return firstName;
-    }
-    return firstName + ' ' + lastName;
-  }
 
   return (
     <table id="myTable" className="table table-dark table-striped table-hover table-bordered" style={{ fontSize: '1.2rem' }}>
@@ -30,7 +21,7 @@ const Table = (props) => {
       </thead>
       <tbody>
         {data.map(row =>
-          <MemberRow key={row['id']} id={row['id']} name={getName(row['firstName'], row['lastName'])} email={row['email']} points={row['points']} />
+          <MemberRow key={row['id']} member={row} />
         )}
       </tbody>
     </table>
