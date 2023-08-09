@@ -37,10 +37,10 @@ namespace LoyaltyRewardsAPI.Data {
             modelBuilder.Entity<Member>().HasData(members);
 
             List<Transaction> transactions = new List<Transaction> {
-                new Transaction { Id = 1, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(4).ToUnixTimeMilliseconds(), PointsEarned = -100 },
-                new Transaction { Id = 2, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(1).ToUnixTimeMilliseconds(), PointsEarned = 55 },
-                new Transaction { Id = 3, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(2).ToUnixTimeMilliseconds(), PointsEarned = 20 },
-                new Transaction { Id = 4, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(3).ToUnixTimeMilliseconds(), PointsEarned = 35 },
+                new Transaction { Id = 1, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(4).ToUnixTimeMilliseconds(), PointsEarned = -100, Employee = "Albert" },
+                new Transaction { Id = 2, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(1).ToUnixTimeMilliseconds(), PointsEarned = 55, Employee = "Albert" },
+                new Transaction { Id = 3, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(2).ToUnixTimeMilliseconds(), PointsEarned = 20, Employee = "Albert" },
+                new Transaction { Id = 4, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(3).ToUnixTimeMilliseconds(), PointsEarned = 35, Employee = "Albert" },
             };
 
             modelBuilder.Entity<Transaction>().HasData(transactions);

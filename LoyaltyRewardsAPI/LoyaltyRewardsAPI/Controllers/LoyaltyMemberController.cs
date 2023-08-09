@@ -26,18 +26,18 @@ namespace LoyaltyRewardsAPI.Controllers {
                 return BadRequest(ModelState);
             }
         }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetMember(int id) {
-            Member? member = await db.Members.FindAsync(id);
+        [HttpGet]
+        public async Task<IActionResult> GetMember(int memberId) {
+            Member? member = await db.Members.FindAsync(memberId);
             if (member == null) {
                 return NotFound("No user with that ID found.");
             } else {
                 return Ok(member);
             }
         }
-        [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateMember(int id, [FromBody] PartialMember updatedMember) {
-            Member? member = await db.Members.FindAsync(id);
+        [HttpPatch]
+        public async Task<IActionResult> UpdateMember(int memberId, [FromBody] PartialMember updatedMember) {
+            Member? member = await db.Members.FindAsync(memberId);
             if (member == null) {
                 return NotFound("No user with that ID found.");
             }
@@ -53,9 +53,9 @@ namespace LoyaltyRewardsAPI.Controllers {
             return Ok(member);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMember(int id) {
-            Member? member = await db.Members.FindAsync(id);
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMember(int memberId) {
+            Member? member = await db.Members.FindAsync(memberId);
             if (member == null) {
                 return NotFound("No user with that ID found.");
             }
@@ -127,7 +127,6 @@ namespace LoyaltyRewardsAPI.Controllers {
                 return NotFound("No user with that ID found.");
             }
             int sum = transactions.Sum(x => x.PointsEarned);
-            await Console.Out.WriteLineAsync(sum.ToString());
             member.Points = sum;
             db.Update(member);
             await db.SaveChangesAsync();

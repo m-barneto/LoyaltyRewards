@@ -11,7 +11,7 @@ namespace LoyaltyRewardsAPI.Controllers {
         private readonly IConfiguration config;
         public TransactionController(AppDatabase db, IConfiguration config) { this.db = db; this.config = config; }
 
-        [HttpPost("{transactionId}")]
+        [HttpPost]
         public async Task<IActionResult> CreateTransaction(int transactionId, [FromBody] Transaction transaction) {
             if (ModelState.IsValid) {
                 Member? member = await db.Members.FindAsync(transaction.MemberId);
@@ -31,12 +31,12 @@ namespace LoyaltyRewardsAPI.Controllers {
             }
         }
 
-        [HttpGet("{transactionId}")]
+        [HttpGet]
         public async Task<IActionResult> GetTransaction(int transactionId) {
             return Ok(await db.Transactions.FindAsync(transactionId));
         }
 
-        [HttpPatch("{transactionId}")]
+        [HttpPatch]
         public async Task<IActionResult> UpdateTransaction(int transactionId, [FromBody] PartialTransaction updatedTransaction) {
             Transaction? transaction = await db.Transactions.FindAsync(transactionId);
             if (transaction == null) {
@@ -49,7 +49,7 @@ namespace LoyaltyRewardsAPI.Controllers {
                 // Find member
                 Member? member = await db.Members.FindAsync(transaction.Member.Id);
                 if (member == null) {
-                    return StatusCode(500, "No member found with associated transaction!");
+                    return NotFound("No member found with associated transaction!");
                 }
 
                 member.Points += diff;
@@ -65,14 +65,18 @@ namespace LoyaltyRewardsAPI.Controllers {
             return Ok(transaction);
         }
 
-        [HttpDelete("{transactionId}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteTransaction(int transactionId) {
             Transaction? transaction = await db.Transactions.FindAsync(transactionId);
             if (transaction == null) {
                 return NotFound("No transaction with that ID found.");
             }
 
-            Member member = transaction.Member;
+            Member? member = await db.Members.FindAsync(transaction.MemberId);
+            if (member == null) {
+                NotFound("No member found with associated transaction!");
+            }
+
             member.Points -= transaction.PointsEarned;
             db.Update(member);
 

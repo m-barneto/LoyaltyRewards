@@ -21,7 +21,7 @@ const Table = (props) => {
       </thead>
       <tbody>
         {data.map(row =>
-          <MemberRow key={row['id']} member={row} />
+          <MemberRow key={row['id']} memberId={row['id']} member={row} />
         )}
       </tbody>
     </table>
