@@ -27,7 +27,7 @@ namespace LoyaltyRewardsAPI.Data {
             modelBuilder.Entity<Transaction>().HasOne(x => x.Member).WithMany().HasForeignKey("MemberId");
             modelBuilder.Entity<Transaction>().ToTable("Transactions");
 
-            Member matthew = new Member { Id = 1, FirstName = "Matthew", LastName = "Barneto", Email = "asdasdsa@giasndc.com" };
+            Member matthew = new Member { Id = 1, FirstName = "Matthew", LastName = "Barneto", Email = "asdasdsa@giasndc.com", Meta = "Medium iced americano with 2 shots, no cream." };
             List<Member> members = new List<Member> {
                 matthew,
                 new Member { Id = 2, FirstName = "Nicholas", LastName = "Cage", Email = "5435@123.com" },
@@ -37,7 +37,10 @@ namespace LoyaltyRewardsAPI.Data {
             modelBuilder.Entity<Member>().HasData(members);
 
             List<Transaction> transactions = new List<Transaction> {
-                new Transaction { Id = 1, MemberId = matthew.Id, Date = DateTime.UtcNow.Ticks, PointsEarned = 10 }
+                new Transaction { Id = 1, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(4).ToUnixTimeMilliseconds(), PointsEarned = -100 },
+                new Transaction { Id = 2, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(1).ToUnixTimeMilliseconds(), PointsEarned = 55 },
+                new Transaction { Id = 3, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(2).ToUnixTimeMilliseconds(), PointsEarned = 20 },
+                new Transaction { Id = 4, MemberId = matthew.Id, Date = DateTimeOffset.Now.AddHours(3).ToUnixTimeMilliseconds(), PointsEarned = 35 },
             };
 
             modelBuilder.Entity<Transaction>().HasData(transactions);
