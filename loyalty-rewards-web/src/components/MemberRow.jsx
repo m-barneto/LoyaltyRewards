@@ -50,6 +50,7 @@ const MemberRow = (props) => {
       .then(function (response) {
         console.log(response);
         loadTransactions();
+        loadMember();
       })
       .catch(function (error) {
         console.log(error);
@@ -78,25 +79,25 @@ const MemberRow = (props) => {
         centered='true'
       >
         <Modal.Header className='d-flex align-items-center justify-content-center'>
-          <Modal.Title id='example-custom-modal-styling-title'>{getName(getMember()['firstName'], getMember()['lastName'])}</Modal.Title>
+          <Modal.Title id='example-custom-modal-styling-title'>{getName(member['firstName'], member['lastName'])}</Modal.Title>
         </Modal.Header>
         <Modal.Body className='d-flex flex-column'>
           <Row className="h-50">
             <Col className="" style={{ paddingRight: 0 }}>
               <div className='h-100 bg-secondary-subtle rounded m-2 d-flex align-items-center justify-content-center' style={{ fontSize: '5rem' }}>
-                {getMember()['points']}
+                {updatedMember ? updatedMember['points'] : member['points']}
               </div>
             </Col>
             <Col className="" style={{ paddingLeft: 0, paddingRight: '.75rem' }}>
               <div className='h-100 bg-secondary-subtle rounded m-2' style={{ fontSize: '2rem' }}>
-                <p className='p-2'>{getMember()['meta']}</p>
+                <p className='p-2'>{updatedMember ? updatedMember['meta'] : member['meta']}</p>
               </div>
             </Col>
           </Row>
           <Row className="h-50 pt-3">
             <Col className="" style={{ paddingRight: 0 }}>
               <div className='h-100 bg-secondary-subtle rounded m-2' style={{ fontSize: '1.5rem' }}>
-                <div className='p-2'>
+                <div className='p-2' style={{ overflowY: 'auto', overflowX: 'hidden', maxHeight: '200px' }}>
                   <table id="transactionsTable" className="table table-dark table-striped table-hover table-bordered" style={{ fontSize: '1.2rem', tableLayout: 'auto' }}>
                     <colgroup>
                       <col span="1" style={{ width: '40%' }} />
@@ -115,17 +116,17 @@ const MemberRow = (props) => {
                     <tbody>
                       {
                         transactions.map(t => {
-                          return <tr key={t['id']}>
-                            <td>{new Date(t['date']).toLocaleString('en-US', {
+                          return <tr key={t['id']} style={{ height: 5 }}>
+                            <td style={{ padding: 0, paddingLeft: 2 }}>{new Date(t['date']).toLocaleString('en-US', {
                               day: '2-digit', // numeric, 2-digit
                               year: '2-digit', // numeric, 2-digit
                               month: '2-digit', // numeric, 2-digit, long, short, narrow
                               hour: '2-digit', // numeric, 2-digit
                               minute: 'numeric', // numeric, 2-digit
                             })}</td>
-                            <td>{t['pointsEarned']}</td>
-                            <td>{t['employee']}</td>
-                            <td><Button variant="secondary" onClick={() => deleteTransaction(t['id'])}>X</Button></td>
+                            <td className='p-0'>{t['pointsEarned']}</td>
+                            <td className='p-0'>{t['employee']}</td>
+                            <td className='p-0'><Button variant="secondary" onClick={() => deleteTransaction(t['id'])}>X</Button></td>
                           </tr>
                         })
                       }
@@ -136,7 +137,7 @@ const MemberRow = (props) => {
             </Col>
             <Col className="" style={{ paddingLeft: 0, paddingRight: '.75rem' }}>
               <div className='h-100 bg-secondary-subtle rounded m-2' style={{ fontSize: '2rem' }}>
-                {getMember()['meta']}
+                {updatedMember ? updatedMember['meta'] : member['meta']}
               </div>
             </Col>
           </Row>
