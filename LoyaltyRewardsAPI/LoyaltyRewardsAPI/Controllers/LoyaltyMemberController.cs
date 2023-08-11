@@ -124,7 +124,7 @@ namespace LoyaltyRewardsAPI.Controllers {
             List<Transaction> transactions = await db.Transactions.Where(x => x.MemberId == memberId).OrderBy(x => x.Date).ToListAsync();
             Member? member = await db.Members.FindAsync(memberId);
             if (member == null) {
-                return NotFound("No user with that ID found.");
+                return NotFound("No member with that ID found.");
             }
             int sum = transactions.Sum(x => x.PointsEarned);
             member.Points = sum;

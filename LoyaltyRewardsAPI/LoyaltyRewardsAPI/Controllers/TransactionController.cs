@@ -16,7 +16,7 @@ namespace LoyaltyRewardsAPI.Controllers {
             if (ModelState.IsValid) {
                 Member? member = await db.Members.FindAsync(transaction.MemberId);
                 if (member == null) {
-                    return BadRequest("No member found with associated member.");
+                    return BadRequest("No member with that ID found.");
                 }
                 transaction.Date = DateTime.UtcNow.Ticks;
                 transaction.PointsEarned = transaction.PointsEarned;

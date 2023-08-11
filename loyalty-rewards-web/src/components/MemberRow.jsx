@@ -7,15 +7,27 @@ const MemberRow = (props) => {
   const [show, setShow] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [updatedMember, setUpdatedMember] = useState(null);
+  const [rewards, setRewards] = useState([]);
 
   const handleClose = () => setShow(false);
   const handleShow = () => {
     loadMember();
     loadTransactions();
+    loadRewards();
     setShow(true);
   }
   const handleSubmit = (e) => {
     e.preventDefault();
+  }
+
+  const redeemReward = (e) => {
+    e.preventDefault();
+    var ele = document.getElementsByName('reward');
+    for (var i = 0; i < ele.length; i++) {
+      if (ele[i].checked) {
+        
+      }
+    }
   }
 
   function loadMember() {
@@ -38,6 +50,17 @@ const MemberRow = (props) => {
       });
   }
 
+  function loadRewards() {
+    axios.get('https://localhost:7223/reward/list')
+      .then(function (response) {
+        console.log(response.data);
+        setRewards(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
   function getName(firstName, lastName) {
     if (lastName == null) {
       return firstName;
@@ -48,7 +71,6 @@ const MemberRow = (props) => {
   function deleteTransaction(transactionId) {
     axios.delete('https://localhost:7223/transaction', { params: { transactionId: transactionId } })
       .then(function (response) {
-        console.log(response);
         loadTransactions();
         loadMember();
       })
@@ -58,9 +80,6 @@ const MemberRow = (props) => {
   }
 
   function getMember() {
-    if (updatedMember !== null) {
-      console.log(updatedMember['points']);
-    }
     return updatedMember === null ? member : updatedMember;
   }
 
@@ -136,8 +155,20 @@ const MemberRow = (props) => {
               </div>
             </Col>
             <Col className="" style={{ paddingLeft: 0, paddingRight: '.75rem' }}>
-              <div className='h-100 bg-secondary-subtle rounded m-2' style={{ fontSize: '2rem' }}>
-                {updatedMember ? updatedMember['meta'] : member['meta']}
+              <div className='h-100 bg-secondary-subtle rounded m-2' style={{ fontSize: '1.5rem', position: 'relative' }}>
+                <div className='p-2'>
+                  <form onSubmit={redeemReward}>
+                {rewards ? rewards.map(r => {
+                          return <label key={r['id']} htmlFor={r['id']} >
+                              <input type="radio" id={r['id']} name='reward' value={r['id']} style={{verticalAlign: 'middle'}}/>
+                              &nbsp;{r['pointCost']} - {r['description']}
+                            </label>
+                        })
+                : ''}
+                  <br></br>
+                  <Button variant="primary" type='submit' style={{position: 'absolute', right: 10, bottom: 10}}>Redeem</Button>
+                  </form>
+                </div>
               </div>
             </Col>
           </Row>
