@@ -2,6 +2,7 @@
 using LoyaltyRewardsAPI.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
 
 namespace LoyaltyRewardsAPI.Controllers {
     [ApiController]
@@ -21,6 +22,18 @@ namespace LoyaltyRewardsAPI.Controllers {
 
                 await db.Members.AddAsync(newMember);
                 await db.SaveChangesAsync();
+
+                await Console.Out.WriteLineAsync(newMember.Id.ToString());
+                Transaction transaction = new Transaction {
+                    MemberId = newMember.Id,
+                    Date = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+                    PointsEarned = config.GetValue<int>("AppSettings:NewMemberPoints"),
+                    Employee = "System"
+                };
+
+                await db.Transactions.AddAsync(transaction);
+                await db.SaveChangesAsync();
+
                 return Ok(newMember);
             } else {
                 return BadRequest(ModelState);

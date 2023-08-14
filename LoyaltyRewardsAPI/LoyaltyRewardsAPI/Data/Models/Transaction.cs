@@ -7,7 +7,6 @@ namespace LoyaltyRewardsAPI.Data.Models {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
         public int MemberId { get; set; }
         public Member Member { get; set; } = null!;
 

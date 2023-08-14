@@ -8,7 +8,6 @@ namespace LoyaltyRewardsAPI.Data.Models {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
         public string FirstName { get; set; } = string.Empty;
 
         public string LastName { get; set; } = string.Empty;
@@ -20,6 +19,8 @@ namespace LoyaltyRewardsAPI.Data.Models {
         public string BirthdayMonth { get; set; } = string.Empty;
 
         public int Points { get; set; }
+
+        public string Flags { get; set; } = string.Empty;
 
         public long LastUpdatedTime { get; set; }
 

@@ -1,10 +1,8 @@
-import { useState } from 'react';
+import { React, useState } from 'react';
 import { Button, Modal, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
-import MemberModal from '../components/MemberModal';
-
-const MemberRow = (props) => {
+const MemberModal = (props) => {
   const { memberId, member } = props;
   const [show, setShow] = useState(false);
   const [transactions, setTransactions] = useState([]);
@@ -98,14 +96,8 @@ const MemberRow = (props) => {
   function getMember() {
     return updatedMember === null ? member : updatedMember;
   }
-
   return (
     <>
-      <tr onClick={handleShow} role='button'>
-        <td>{getName(getMember()['firstName'], getMember()['lastName'])}</td>
-        <td>{getMember()['email']}</td>
-        <td>{getMember()['points']}</td>
-      </tr>
       <Modal
         size='xl'
         show={show}
@@ -199,4 +191,4 @@ const MemberRow = (props) => {
   )
 }
 
-export default MemberRow;
+export default MemberModal;

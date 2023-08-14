@@ -14,5 +14,7 @@ namespace LoyaltyRewardsAPI.Data.Models {
         public string? BirthdayMonth { get; set; }
 
         public int? Points { get; set; }
+
+        public string? Flags { get; set; }
     }
 }

@@ -12,14 +12,18 @@ namespace LoyaltyRewardsAPI.Controllers {
         public TransactionController(AppDatabase db, IConfiguration config) { this.db = db; this.config = config; }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTransaction(int transactionId, [FromBody] Transaction transaction) {
+        public async Task<IActionResult> CreateTransaction([FromBody] Transaction transaction) {
             if (ModelState.IsValid) {
                 Member? member = await db.Members.FindAsync(transaction.MemberId);
                 if (member == null) {
                     return BadRequest("No member with that ID found.");
                 }
-                transaction.Date = DateTime.UtcNow.Ticks;
-                transaction.PointsEarned = transaction.PointsEarned;
+
+                if (member.Points + transaction.PointsEarned < 0) {
+                    return StatusCode(406, "Member doesn't have enough points to redeem.");
+                }
+                transaction.Member = member;
+                transaction.Date = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
                 member.Points += transaction.PointsEarned;
                 db.Update(member);
@@ -74,7 +78,7 @@ namespace LoyaltyRewardsAPI.Controllers {
 
             Member? member = await db.Members.FindAsync(transaction.MemberId);
             if (member == null) {
-                NotFound("No member found with associated transaction!");
+                return NotFound("No member found with associated transaction!");
             }
 
             member.Points -= transaction.PointsEarned;
