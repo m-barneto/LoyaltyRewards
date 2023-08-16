@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { Button, Modal, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
-import MemberModal from '../components/MemberModal';
-
 const MemberRow = (props) => {
   const { memberId, member } = props;
   const [show, setShow] = useState(false);
@@ -18,30 +16,17 @@ const MemberRow = (props) => {
     loadRewards();
     setShow(true);
   }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  }
 
   const redeemReward = (e) => {
     e.preventDefault();
     var ele = document.getElementsByName('reward');
     for (var i = 0; i < ele.length; i++) {
       if (ele[i].checked) {
-        console.log('Redeeming reward: ' + memberId);
-        var transactionForm = {
-          memberId: memberId,
-          member: {},
-          date: 0,
-          pointsEarned: -rewards.find(r => r.id == ele[i].value)['pointCost'],
-          employee: 'Albert'
-        }
-        axios.post('https://localhost:7223/transaction', transactionForm)
-          .then(function (response) {
-            loadMember();
-            loadTransactions();
-            loadRewards();
-          })
-          .catch(function (error) {
-            console.log(error);
-          })
-        break;
+        console.log(ele[i].value);
+        
       }
     }
   }
@@ -124,7 +109,7 @@ const MemberRow = (props) => {
               </div>
             </Col>
             <Col className="" style={{ paddingLeft: 0, paddingRight: '.75rem' }}>
-              <div className='h-100 bg-secondary-subtle rounded m-2' style={{ fontSize: '1.5rem' }}>
+              <div className='h-100 bg-secondary-subtle rounded m-2' style={{ fontSize: '2rem' }}>
                 <p className='p-2'>{updatedMember ? updatedMember['meta'] : member['meta']}</p>
               </div>
             </Col>
@@ -174,15 +159,15 @@ const MemberRow = (props) => {
               <div className='h-100 bg-secondary-subtle rounded m-2' style={{ fontSize: '1.5rem', position: 'relative' }}>
                 <div className='p-2'>
                   <form onSubmit={redeemReward}>
-                    {rewards ? rewards.map(r => {
-                      return <label key={r['id']} htmlFor={r['id']} >
-                        <input type="radio" id={r['id']} name='reward' value={r['id']} style={{ verticalAlign: 'middle' }} />
-                        &nbsp;{r['pointCost']} - {r['description']}
-                      </label>
-                    })
-                      : ''}
-                    <br></br>
-                    <Button variant="primary" type='submit' style={{ position: 'absolute', right: 10, bottom: 10 }}>Redeem</Button>
+                {rewards ? rewards.map(r => {
+                          return <label key={r['id']} htmlFor={r['id']} >
+                              <input type="radio" id={r['id']} name='reward' value={r['id']} style={{verticalAlign: 'middle'}}/>
+                              &nbsp;{r['pointCost']} - {r['description']}
+                            </label>
+                        })
+                : ''}
+                  <br></br>
+                  <Button variant="primary" type='submit' style={{position: 'absolute', right: 10, bottom: 10}}>Redeem</Button>
                   </form>
                 </div>
               </div>
@@ -193,6 +178,7 @@ const MemberRow = (props) => {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
+          <Button variant="primary" onClick={handleSubmit}>Understood</Button>
         </Modal.Footer>
       </Modal>
     </>
