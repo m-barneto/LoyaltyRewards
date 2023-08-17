@@ -5,7 +5,7 @@ export default function SearchBar(props) {
   const { search } = props;
   const [query, setQuery] = useState("");
   let navigate = useNavigate();
-  //<SearchBar search={search} setQuery={(x) => setSearchParams({'q': encodeURIComponent(x)})}></SearchBar>
+
   return (
     <form
       className="d-flex"

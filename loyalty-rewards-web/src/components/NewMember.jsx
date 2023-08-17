@@ -1,12 +1,19 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import { Button, Modal, Form, Row, Col, InputGroup } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export default function NewMember() {
+export default function NewMember(props) {
+  const { navigate } = props;
   const [show, setShow] = useState(false);
+  const [redirectMember, setRedirectMember] = useState("");
 
-  let navigator = useNavigate();
+  useEffect(() => {
+    if (redirectMember !== "") {
+      navigate(redirectMember);
+      navigate(0);
+    }
+  }, [redirectMember]);
 
   const handleClose = () => {
     setShow(false);
@@ -34,8 +41,8 @@ export default function NewMember() {
     axios
       .post("https://localhost:7223/loyaltymember", memberForm)
       .then(function (response) {
-        console.log(response.data);
-        navigator("/member/" + response.data["id"], { relative: false });
+        let memberPage = "/member/" + response.data["id"];
+        setRedirectMember(memberPage);
       })
       .catch(function (error) {
         console.log(error);

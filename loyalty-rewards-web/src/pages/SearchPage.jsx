@@ -103,7 +103,6 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (refresh) {
-      console.log("refresh");
       popTable();
     }
     setRefresh(false);
@@ -112,6 +111,7 @@ export default function SearchPage() {
   function changePage(val) {
     if (val >= 0 && val < maxPage) {
       setPage(val);
+      setRefresh(true);
     }
   }
 

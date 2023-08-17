@@ -81,11 +81,14 @@ namespace LoyaltyRewardsAPI.Controllers {
 
         private Tuple<int, List<Member>>? PaginateList(List<Member> members, int page, int entries, bool isList = false) {
             int allowedPages = members.Count / entries + (members.Count % entries > 0 ? 1 : 0);
+            if (isList) {
+                allowedPages = db.Members.Count() / entries + (db.Members.Count() % entries > 0 ? 1 : 0);
+            }
             if (page >= allowedPages) {
                 return null;
             }
 
-            Tuple<int, List<Member>> results = new Tuple<int, List<Member>>(isList ? 3 : allowedPages, new List<Member>());
+            Tuple<int, List<Member>> results = new Tuple<int, List<Member>>(allowedPages, new List<Member>());
 
             int startIndex = page * entries;
             int endIndex = startIndex + entries;
@@ -138,7 +141,7 @@ namespace LoyaltyRewardsAPI.Controllers {
 
         [HttpGet("transactions")]
         public async Task<IActionResult> GetAllTransactions(int memberId) {
-            List<Transaction> transactions = await db.Transactions.Where(x => x.MemberId == memberId).OrderBy(x => x.Date).ToListAsync();
+            List<Transaction> transactions = await db.Transactions.Where(x => x.MemberId == memberId).OrderByDescending(x => x.Date).ToListAsync();
             Member? member = await db.Members.FindAsync(memberId);
             if (member == null) {
                 return NotFound("No member with that ID found.");

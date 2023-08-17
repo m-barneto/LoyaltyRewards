@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Modal, Row, Col } from "react-bootstrap";
+import { Button, Row, Col } from "react-bootstrap";
 import axios from "axios";
 
 import MainLayout from "../layouts/MainLayout";
@@ -11,23 +11,39 @@ export default function MemberPage() {
   const [transactions, setTransactions] = useState([]);
   const [member, setMember] = useState(null);
   const [rewards, setRewards] = useState([]);
+  const [refresh, setRefresh] = useState(true);
 
   useEffect(() => {
-    loadTransactions();
-    loadRewards();
-    loadMember();
-  }, []);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
+    if (refresh) {
+      loadTransactions();
+      loadRewards();
+      loadMember();
+    }
+    setRefresh(false);
+  }, [refresh]);
 
   const redeemReward = (e) => {
     e.preventDefault();
     var ele = document.getElementsByName("reward");
+
     for (var i = 0; i < ele.length; i++) {
       if (ele[i].checked) {
-        console.log(ele[i].value);
+        let reward = rewards.find((r) => r["id"] == ele[i].value);
+        let form = {
+          memberId: member["id"],
+          member: {},
+          pointsEarned: -reward["pointCost"],
+          employee: "Albert",
+        };
+        axios
+          .post("https://localhost:7223/transaction", form)
+          .then(function (response) {
+            setRefresh(true);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        break;
       }
     }
   };
@@ -60,7 +76,6 @@ export default function MemberPage() {
     axios
       .get("https://localhost:7223/reward/list")
       .then(function (response) {
-        console.log(response.data);
         setRewards(response.data);
       })
       .catch(function (error) {
@@ -213,6 +228,7 @@ export default function MemberPage() {
                         : ""}
                       <br></br>
                       <Button
+                        className="btn btn-lg"
                         variant="primary"
                         type="submit"
                         style={{ position: "absolute", right: 10, bottom: 10 }}
