@@ -2,7 +2,9 @@
 using LoyaltyRewardsAPI.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Diagnostics.Metrics;
+using System.Net;
 
 namespace LoyaltyRewardsAPI.Controllers {
     [ApiController]
@@ -23,7 +25,6 @@ namespace LoyaltyRewardsAPI.Controllers {
                 await db.Members.AddAsync(newMember);
                 await db.SaveChangesAsync();
 
-                await Console.Out.WriteLineAsync(newMember.Id.ToString());
                 Transaction transaction = new Transaction {
                     MemberId = newMember.Id,
                     Date = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
@@ -100,22 +101,25 @@ namespace LoyaltyRewardsAPI.Controllers {
         [HttpGet("search")]
         public async Task<IActionResult> SearchMembers(int page, int entries, string query) {
             query = query.Substring(2).Trim().ToUpper();
+            query = WebUtility.UrlDecode(query);
             string[] tokens = query.Split(" ");
-            List<Member> matchingMembers = new List<Member>();
+            HashSet<Member> matchingMembers = new HashSet<Member>();
 
             for (int i = 0; i < tokens.Length && i < 5; i++) {
+                if (tokens[i].Equals("")) continue;
                 var members = await db.Members.Where(u =>
                         u.FirstName.ToUpper().Contains(tokens[i])
                      || u.LastName.ToUpper().Contains(tokens[i])
                      || u.Email.ToUpper().Contains(tokens[i])).ToListAsync();
-                matchingMembers.AddRange(members);
+                matchingMembers.UnionWith(members);
             }
+
 
             if (matchingMembers.Count == 0) {
                 return Ok(new Tuple<int, List<Member>>(0, new List<Member>()));
             }
 
-            Tuple<int, List<Member>>? results = PaginateList(matchingMembers, page, entries);
+            Tuple<int, List<Member>>? results = PaginateList(matchingMembers.ToList(), page, entries);
             if (results == null) {
                 return BadRequest("Page index out of bounds.");
             }
