@@ -1,14 +1,24 @@
 import { React, useState, useEffect } from 'react';
-import MemberRow from '../components/MemberRow';
+
 
 import axios from 'axios';
 
 
 import MainLayout from '../layouts/MainLayout';
 import SearchBar from '../components/SearchBar';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const Table = (props) => {
   const { data } = props;
+
+  function getName(firstName, lastName) {
+    if (lastName == null) {
+      return firstName;
+    }
+    return firstName + ' ' + lastName;
+  }
+
+  let navigate = useNavigate();
 
   return (
     <table id="myTable" className="table table-dark table-striped table-hover table-bordered" style={{ fontSize: '1.2rem' }}>
@@ -20,8 +30,12 @@ const Table = (props) => {
         </tr>
       </thead>
       <tbody>
-        {data.map(row =>
-          <MemberRow key={row['id']} memberId={row['id']} member={row} />
+        {data && data.map(row =>
+            <tr key={row['id']} onClick={() => navigate('../member/' + row['id'])} role='button'>
+            <td>{getName(row['firstName'], row['lastName'])}</td>
+            <td>{row['email']}</td>
+            <td>{row['points']}</td>
+          </tr>
         )}
       </tbody>
     </table>
@@ -55,14 +69,14 @@ const PageNav = (props) => {
 }
 
 export default function SearchPage() {
-  const [query, setQuery] = useState(null);
   const [members, setMembers] = useState([]);
   const [page, setPage] = useState(0);
   const [maxPage, setMaxPage] = useState(0);
+  let [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     popTable();
-  }, [page])
+  }, [page, members])
 
   function changePage(val) {
     if (val >= 0 && val < maxPage) {
@@ -71,8 +85,8 @@ export default function SearchPage() {
   }
 
   function popTable() {
-    if (query) {
-      axios.get('https://localhost:7223/LoyaltyMember/search', { params: { page: page, entries: 20, query: query } })
+    if (searchParams.has('q') && searchParams.get('q') !== '') {
+      axios.get('https://localhost:7223/LoyaltyMember/search', { params: { page: page, entries: 20, query: searchParams } })
         .then(function (response) {
           setMembers(response.data['item2']);
           setMaxPage(response.data['item1']);
@@ -92,19 +106,17 @@ export default function SearchPage() {
     }
   }
 
-  function search(e) {
-    e.preventDefault();
-
+  function search() {
+    return;
     if (page === 0) {
       popTable();
     }
     setPage(0);
-
   }
 
   return (
     <MainLayout>
-      <SearchBar search={search} setQuery={setQuery}></SearchBar>
+      <SearchBar></SearchBar>
       <div className='mt-3 p-2 bg-dark rounded' onLoad={search}>
         <Table data={members} />
         <PageNav page={page} maxPage={maxPage} changePage={changePage} />

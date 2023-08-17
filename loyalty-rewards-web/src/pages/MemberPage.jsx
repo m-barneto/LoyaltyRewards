@@ -4,6 +4,7 @@ import { Button, Modal, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
 import MainLayout from '../layouts/MainLayout';
+import SearchBar from '../components/SearchBar';
 
 export default function MemberPage() {
   const { id } = useParams();
@@ -15,7 +16,7 @@ export default function MemberPage() {
     loadTransactions();
     loadRewards();
     loadMember();
-  }, [member])
+  }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -83,6 +84,7 @@ export default function MemberPage() {
 
   return (
     <MainLayout>
+      <SearchBar></SearchBar>
       {member &&
         <div className='mt-3 p-2 bg-dark rounded'>
           <div className='d-flex align-items-center justify-content-center'>

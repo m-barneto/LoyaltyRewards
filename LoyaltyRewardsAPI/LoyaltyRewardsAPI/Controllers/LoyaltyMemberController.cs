@@ -99,7 +99,7 @@ namespace LoyaltyRewardsAPI.Controllers {
 
         [HttpGet("search")]
         public async Task<IActionResult> SearchMembers(int page, int entries, string query) {
-            query = query.Trim().ToUpper();
+            query = query.Substring(2).Trim().ToUpper();
             string[] tokens = query.Split(" ");
             List<Member> matchingMembers = new List<Member>();
 
@@ -112,7 +112,7 @@ namespace LoyaltyRewardsAPI.Controllers {
             }
 
             if (matchingMembers.Count == 0) {
-                return NotFound("No users found matching the search criteria.");
+                return Ok(new Tuple<int, List<Member>>(0, new List<Member>()));
             }
 
             Tuple<int, List<Member>>? results = PaginateList(matchingMembers, page, entries);
