@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Row, Col } from "react-bootstrap";
+import { Button, Row, Col, Form } from "react-bootstrap";
 import axios from "axios";
 
 import MainLayout from "../layouts/MainLayout";
@@ -134,6 +134,24 @@ export default function MemberPage() {
                 >
                   <p className="p-2">{member["meta"]}</p>
                 </div>
+              </Col>
+            </Row>
+            <Row className="h-50 pt-3 mb-3">
+              <Col style={{ paddingLeft: '20px', paddingRight: '22px' }}>
+                <Form controlId="addPoints" className="d-flex align-items-end">
+                  <Form.Control placeholder="Amount" />
+                  <Button variant="primary" type="submit">
+                    Add
+                  </Button>
+                </Form>
+              </Col>
+              <Col style={{ paddingLeft: -20, paddingRight: ".75rem" }}>
+              <Form controlId="removePoints" className="d-flex align-items-end">
+                <Form.Control placeholder="Amount" />
+                <Button variant="primary" type="submit">
+                  Remove
+                </Button>
+              </Form>
               </Col>
             </Row>
             <Row className="h-50 pt-3 mb-3">
