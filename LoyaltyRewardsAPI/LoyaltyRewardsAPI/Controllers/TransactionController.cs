@@ -24,6 +24,7 @@ namespace LoyaltyRewardsAPI.Controllers {
                     return StatusCode(StatusCodes.Status402PaymentRequired, "Member doesn't have enough points to redeem.");
                 }
                 transaction.Member = member;
+                transaction.MemberId = member.Id;
                 transaction.Date = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
                 member.Points += transaction.PointsEarned;

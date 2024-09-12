@@ -4,11 +4,14 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
 builder.Services.AddSingleton<ConfigurationBuilder>(config => {
     var builder = new ConfigurationBuilder();
     builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
     return builder;
 });
+
 builder.Services.AddDbContext<AppDatabase>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddCors(options => options.AddDefaultPolicy(builder => builder.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 builder.Services.AddControllers();

@@ -23,9 +23,9 @@ namespace LoyaltyRewardsAPI.Data {
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.Entity<Member>().HasMany(x => x.Transactions).WithOne(x => x.Member);
+            modelBuilder.Entity<Member>().HasMany(x => x.Transactions).WithOne(x => x.Member);
             modelBuilder.Entity<Member>().ToTable("Members");
-            //modelBuilder.Entity<Transaction>().HasOne(x => x.Member).WithMany().HasForeignKey("MemberId");
+            modelBuilder.Entity<Transaction>().HasOne(x => x.Member).WithMany(x => x.Transactions).HasForeignKey("MemberId");
             modelBuilder.Entity<Transaction>().ToTable("Transactions");
 
             modelBuilder.Entity<Reward>().ToTable("Rewards");
@@ -55,22 +55,6 @@ namespace LoyaltyRewardsAPI.Data {
                 new Reward {Id = 4, PointCost = 300, Description = "Latte, Mocha, or Chai"},
             };
             modelBuilder.Entity<Reward>().HasData(rewards);
-
-            /*
-            modelBuilder.Entity<InviteModel>().ToTable("Invites", "test");
-
-            List<UserModel> users = new List<UserModel>();
-            for (int i = 0; i < 10; i++) {
-                users.Add(new UserModel { Id = $"test{i}", Email = $"email{i}@gmail.com", AccountCreateTime = new DateTime(2021, i + 1, 20).Ticks, LastSigninTime = DateTime.Now.Ticks });
-            }
-            modelBuilder.Entity<UserModel>().HasData(users);
-
-            List<InviteModel> invites = new List<InviteModel>();
-            for (int i = 0; i < 10; i++) {
-                invites.Add(new InviteModel { CreatorId = $"test{i}", InviteCreationTime = new DateTime(2021, i + 1, 20).Ticks, InviteData = "blob"});
-            }
-            modelBuilder.Entity<InviteModel>().HasData(invites);
-             */
         }
     }
 }

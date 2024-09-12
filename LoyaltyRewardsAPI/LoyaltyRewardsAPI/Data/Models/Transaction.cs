@@ -8,7 +8,8 @@ namespace LoyaltyRewardsAPI.Data.Models {
         public int Id { get; set; }
 
         public int MemberId { get; set; }
-        public Member Member { get; set; } = null!;
+        [ForeignKey("MemberId")]
+        public virtual Member Member { get; set; } = null!;
 
         public long Date { get; set; }
 

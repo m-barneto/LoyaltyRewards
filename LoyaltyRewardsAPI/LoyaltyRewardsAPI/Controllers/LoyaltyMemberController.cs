@@ -1,4 +1,5 @@
-﻿using LoyaltyRewardsAPI.Data;
+﻿using AutoMapper;
+using LoyaltyRewardsAPI.Data;
 using LoyaltyRewardsAPI.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,21 +13,33 @@ namespace LoyaltyRewardsAPI.Controllers {
     public class LoyaltyMemberController : ControllerBase {
         private readonly AppDatabase db;
         private readonly IConfiguration config;
-        public LoyaltyMemberController(AppDatabase db, IConfiguration config) { this.db = db; this.config = config; }
+        private readonly IMapper mapper;
+        public LoyaltyMemberController(AppDatabase db, IConfiguration config, IMapper mapper) { this.db = db; this.config = config; this.mapper = mapper; }
 
         // CRUD
         [HttpPost]
-        public async Task<IActionResult> CreateMember([FromBody] Member newMember) {
+        public async Task<IActionResult> CreateMember([FromBody] PartialMember newMember) {
             if (ModelState.IsValid) {
-                newMember.AccountCreateTime = DateTime.UtcNow.Ticks;
-                newMember.LastUpdatedTime = DateTime.UtcNow.Ticks;
-                newMember.Points = config.GetValue<int>("AppSettings:NewMemberPoints");
+                if (newMember.FirstName == null ||
+                    newMember.LastName == null ||
+                    newMember.Email == null ||
+                    newMember.Meta == null ||
+                    newMember.BirthdayMonth == null
+                    ) {
+                    return BadRequest("Missing required parameters.");
+                }
 
-                await db.Members.AddAsync(newMember);
+                Member member = mapper.Map<Member>(newMember);
+
+                member.AccountCreateTime = DateTime.UtcNow.Ticks;
+                member.LastUpdatedTime = DateTime.UtcNow.Ticks;
+                member.Points = config.GetValue<int>("AppSettings:NewMemberPoints");
+
+                await db.Members.AddAsync(member);
                 await db.SaveChangesAsync();
 
                 Transaction transaction = new Transaction {
-                    MemberId = newMember.Id,
+                    MemberId = member.Id,
                     Date = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
                     PointsEarned = config.GetValue<int>("AppSettings:NewMemberPoints"),
                     Employee = "System"
@@ -35,20 +48,22 @@ namespace LoyaltyRewardsAPI.Controllers {
                 await db.Transactions.AddAsync(transaction);
                 await db.SaveChangesAsync();
 
-                return Ok(newMember);
+                return Ok(mapper.Map<PartialMember>(member));
             } else {
                 return BadRequest(ModelState);
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> GetMember(int memberId) {
             Member? member = await db.Members.FindAsync(memberId);
             if (member == null) {
                 return NotFound("No user with that ID found.");
             } else {
-                return Ok(member);
+                return Ok(mapper.Map<PartialMember>(member));
             }
         }
+
         [HttpPatch]
         public async Task<IActionResult> UpdateMember(int memberId, [FromBody] PartialMember updatedMember) {
             Member? member = await db.Members.FindAsync(memberId);
@@ -67,7 +82,7 @@ namespace LoyaltyRewardsAPI.Controllers {
             db.Members.Update(member);
             await db.SaveChangesAsync();
 
-            return Ok(member);
+            return Ok(mapper.Map<PartialMember>(member));
         }
 
         [HttpDelete]
@@ -80,7 +95,6 @@ namespace LoyaltyRewardsAPI.Controllers {
             await db.SaveChangesAsync();
             return Ok("Member deleted successfully");
         }
-
 
         private Tuple<int, List<Member>>? PaginateList(List<Member> members, int page, int entries, bool isList = false) {
             int allowedPages = members.Count / entries + (members.Count % entries > 0 ? 1 : 0);
@@ -106,8 +120,9 @@ namespace LoyaltyRewardsAPI.Controllers {
 
         [HttpGet("search")]
         public async Task<IActionResult> SearchMembers(int page, int entries, string query) {
-            query = query.Substring(2).Trim().ToUpper();
-            query = WebUtility.UrlDecode(query);
+            //query = query.Substring(2).Trim().ToUpper();
+            //query = WebUtility.UrlDecode(query);
+            query = query.ToUpper().Trim();
             string[] tokens = query.Split(" ");
             HashSet<Member> matchingMembers = new HashSet<Member>();
 
@@ -134,25 +149,32 @@ namespace LoyaltyRewardsAPI.Controllers {
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> ListMembers(int page, int entries) {
+        public async Task<IActionResult> ListMembers(int page = 0, int entries = 8) {
             Tuple<int, List<Member>>? results = PaginateList(await db.Members.OrderByDescending(u => u.Points).Take(entries * (page + 1)).ToListAsync(), page, entries, true);
             if (results == null) {
                 return BadRequest("Page index out of bounds.");
             }
-            return Ok(results);
+            // Convert returned list to partial members
+            List<PartialMember> members = new List<PartialMember>(results.Item2.Count);
+            foreach (var member in results.Item2) {
+                members.Add(mapper.Map<PartialMember>(member));
+            }
+            return Ok(Tuple.Create(results.Item1, members));
         }
 
         [HttpGet("transactions")]
         public async Task<IActionResult> GetAllTransactions(int memberId) {
-            List<Transaction> transactions = await db.Transactions.Where(x => x.MemberId == memberId).OrderByDescending(x => x.Date).ToListAsync();
+
             Member? member = await db.Members.FindAsync(memberId);
             if (member == null) {
                 return NotFound("No member with that ID found.");
             }
-            int sum = transactions.Sum(x => x.PointsEarned);
-            member.Points = sum;
-            db.Update(member);
-            await db.SaveChangesAsync();
+            List<Transaction> transactions = await db.Transactions.Where(x => x.MemberId == memberId).OrderByDescending(x => x.Date).ToListAsync();
+
+            //int sum = transactions.Sum(x => x.PointsEarned);
+            //member.Points = sum;
+            //db.Update(member);
+            //await db.SaveChangesAsync();
             return Ok(transactions);
         }
     }
