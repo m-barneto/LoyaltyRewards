@@ -3,6 +3,7 @@ using LoyaltyRewardsAPI.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace LoyaltyRewardsAPI.Controllers {
     [ApiController]
@@ -10,7 +11,8 @@ namespace LoyaltyRewardsAPI.Controllers {
     public class RewardController : ControllerBase {
         private readonly AppDatabase db;
         private readonly IConfiguration config;
-        public RewardController(AppDatabase db, IConfiguration config) { this.db = db; this.config = config; }
+        private readonly IMapper mapper;
+        public RewardController(AppDatabase db, IConfiguration config, IMapper mapper) { this.db = db; this.config = config; this.mapper = mapper; }
 
         [HttpPost]
         public async Task<IActionResult> CreateReward(int rewardId) {
@@ -18,12 +20,22 @@ namespace LoyaltyRewardsAPI.Controllers {
         }
         [HttpGet]
         public async Task<IActionResult> GetReward(int rewardId) {
-            return Ok(await db.Rewards.FindAsync(rewardId));
+            Reward? reward = await db.Rewards.FindAsync(rewardId);
+            if (reward == null) {
+                return NotFound("No reward with that ID found.");
+            }
+
+            return Ok(mapper.Map<PartialReward>(reward));
         }
 
         [HttpGet("list")]
         public async Task<IActionResult> GetAllRewards() {
-            return Ok(await db.Rewards.ToListAsync());
+            List<Reward> actualRewards = await db.Rewards.ToListAsync();
+            List<PartialReward> rewards = new List<PartialReward>(actualRewards.Count);
+            foreach (Reward reward in actualRewards) {
+                rewards.Add(mapper.Map<PartialReward>(reward));
+            }
+            return Ok(rewards);
         }
         [HttpPatch]
         public async Task<IActionResult> UpdateReward(int rewardId) {
