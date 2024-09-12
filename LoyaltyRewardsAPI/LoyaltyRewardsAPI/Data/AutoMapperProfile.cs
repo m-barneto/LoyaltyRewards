@@ -13,6 +13,13 @@ namespace LoyaltyRewardsAPI.Data {
                 .ForMember(dest => dest.Points, opt => opt.MapFrom(src => src.Points))
                 .ForMember(dest => dest.Flags, opt => opt.MapFrom(src => src.Flags))
                 .ReverseMap();
+
+            CreateMap<Transaction, PartialTransaction>()
+                .ForMember(dest => dest.MemberId, opt => opt.MapFrom(src => src.MemberId))
+                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+                .ForMember(dest => dest.PointsEarned, opt => opt.MapFrom(src => src.PointsEarned))
+                .ForMember(dest => dest.Employee, opt => opt.MapFrom(src => src.Employee))
+                .ReverseMap();
         }
     }
 }

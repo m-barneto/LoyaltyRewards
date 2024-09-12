@@ -1,4 +1,5 @@
-﻿using LoyaltyRewardsAPI.Data;
+﻿using AutoMapper;
+using LoyaltyRewardsAPI.Data;
 using LoyaltyRewardsAPI.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Metrics;
@@ -10,36 +11,49 @@ namespace LoyaltyRewardsAPI.Controllers {
     public class TransactionController : ControllerBase {
         private readonly AppDatabase db;
         private readonly IConfiguration config;
-        public TransactionController(AppDatabase db, IConfiguration config) { this.db = db; this.config = config; }
+        private readonly IMapper mapper;
+        public TransactionController(AppDatabase db, IConfiguration config, IMapper mapper) { this.db = db; this.config = config; this.mapper = mapper; }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTransaction([FromBody] Transaction transaction) {
-            if (ModelState.IsValid) {
-                Member? member = await db.Members.FindAsync(transaction.MemberId);
-                if (member == null) {
-                    return BadRequest("No member with that ID found.");
-                }
-
-                if (member.Points + transaction.PointsEarned < 0) {
-                    return StatusCode(StatusCodes.Status402PaymentRequired, "Member doesn't have enough points to redeem.");
-                }
-                transaction.Member = member;
-                transaction.MemberId = member.Id;
-                transaction.Date = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
-                member.Points += transaction.PointsEarned;
-                db.Update(member);
-                await db.Transactions.AddAsync(transaction);
-                await db.SaveChangesAsync();
-                return Ok(transaction);
-            } else {
-                return BadRequest(ModelState);
+        public async Task<IActionResult> CreateTransaction([FromBody] PartialTransaction newTransaction) {
+            if (newTransaction.MemberId == null ||
+                newTransaction.PointsEarned == null
+                ) {
+                return BadRequest("Missing required parameters.");
             }
+
+            Member? member = await db.Members.FindAsync(newTransaction.MemberId);
+            if (member == null) {
+                return BadRequest("No member with that ID found.");
+            }
+
+            if (member.Points + newTransaction.PointsEarned < 0) {
+                return StatusCode(StatusCodes.Status402PaymentRequired, "Member doesn't have enough points to redeem.");
+            }
+
+            Transaction transaction = mapper.Map<Transaction>(newTransaction);
+            if (newTransaction.Employee == null) {
+                transaction.Employee = "System";
+            }
+
+            transaction.Date = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+            member.Points += newTransaction.PointsEarned.Value;
+
+            db.Update(member);
+            await db.Transactions.AddAsync(transaction);
+            await db.SaveChangesAsync();
+            return Ok(mapper.Map<PartialTransaction>(transaction));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetTransaction(int transactionId) {
-            return Ok(await db.Transactions.FindAsync(transactionId));
+            Transaction? transaction = await db.Transactions.FindAsync(transactionId);
+            if (transaction == null) {
+                return NotFound("No transaction with that ID found.");
+            }
+
+            return Ok(mapper.Map<PartialTransaction>(transaction));
         }
 
         [HttpPatch]
@@ -49,20 +63,22 @@ namespace LoyaltyRewardsAPI.Controllers {
                 return NotFound("No transaction with that ID found.");
             }
 
-            if (updatedTransaction.Date.HasValue) transaction.Date = updatedTransaction.Date.Value;
             if (updatedTransaction.PointsEarned.HasValue) {
-                int diff = updatedTransaction.PointsEarned.Value - transaction.PointsEarned;
                 // Find member
                 Member? member = await db.Members.FindAsync(transaction.Member.Id);
                 if (member == null) {
                     return NotFound("No member found with associated transaction!");
                 }
 
+                int diff = updatedTransaction.PointsEarned.Value - transaction.PointsEarned;
                 member.Points += diff;
                 db.Members.Update(member);
 
                 transaction.PointsEarned = updatedTransaction.PointsEarned.Value;
+            }
 
+            if (updatedTransaction.Employee != null) {
+                transaction.Employee = updatedTransaction.Employee;
             }
 
             db.Transactions.Update(transaction);
@@ -88,7 +104,7 @@ namespace LoyaltyRewardsAPI.Controllers {
 
             db.Transactions.Remove(transaction);
             await db.SaveChangesAsync();
-            return Ok("Transaction deleted successfully");
+            return Ok("Transaction deleted successfully.");
         }
     }
 }

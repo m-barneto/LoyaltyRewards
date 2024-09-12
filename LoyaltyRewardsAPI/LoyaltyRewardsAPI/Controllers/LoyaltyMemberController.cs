@@ -19,39 +19,35 @@ namespace LoyaltyRewardsAPI.Controllers {
         // CRUD
         [HttpPost]
         public async Task<IActionResult> CreateMember([FromBody] PartialMember newMember) {
-            if (ModelState.IsValid) {
-                if (newMember.FirstName == null ||
-                    newMember.LastName == null ||
-                    newMember.Email == null ||
-                    newMember.Meta == null ||
-                    newMember.BirthdayMonth == null
-                    ) {
-                    return BadRequest("Missing required parameters.");
-                }
-
-                Member member = mapper.Map<Member>(newMember);
-
-                member.AccountCreateTime = DateTime.UtcNow.Ticks;
-                member.LastUpdatedTime = DateTime.UtcNow.Ticks;
-                member.Points = config.GetValue<int>("AppSettings:NewMemberPoints");
-
-                await db.Members.AddAsync(member);
-                await db.SaveChangesAsync();
-
-                Transaction transaction = new Transaction {
-                    MemberId = member.Id,
-                    Date = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
-                    PointsEarned = config.GetValue<int>("AppSettings:NewMemberPoints"),
-                    Employee = "System"
-                };
-
-                await db.Transactions.AddAsync(transaction);
-                await db.SaveChangesAsync();
-
-                return Ok(mapper.Map<PartialMember>(member));
-            } else {
-                return BadRequest(ModelState);
+            if (newMember.FirstName == null ||
+                newMember.LastName == null ||
+                newMember.Email == null ||
+                newMember.Meta == null ||
+                newMember.BirthdayMonth == null
+                ) {
+                return BadRequest("Missing required parameters.");
             }
+
+            Member member = mapper.Map<Member>(newMember);
+
+            member.AccountCreateTime = DateTime.UtcNow.Ticks;
+            member.LastUpdatedTime = DateTime.UtcNow.Ticks;
+            member.Points = config.GetValue<int>("AppSettings:NewMemberPoints");
+
+            await db.Members.AddAsync(member);
+            await db.SaveChangesAsync();
+
+            Transaction transaction = new Transaction {
+                MemberId = member.Id,
+                Date = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+                PointsEarned = config.GetValue<int>("AppSettings:NewMemberPoints"),
+                Employee = "System"
+            };
+
+            await db.Transactions.AddAsync(transaction);
+            await db.SaveChangesAsync();
+
+            return Ok(mapper.Map<PartialMember>(member));
         }
 
         [HttpGet]
@@ -77,6 +73,9 @@ namespace LoyaltyRewardsAPI.Controllers {
             if (updatedMember.Meta != null) member.Meta = updatedMember.Meta;
             if (updatedMember.BirthdayMonth != null) member.BirthdayMonth = updatedMember.BirthdayMonth;
 
+            // TODO
+            // Maybe i have to reset transactions here otherwise they would be out of sync...
+            // I could just add a single transaction that negates their current balance
             if (updatedMember.Points.HasValue) member.Points = updatedMember.Points.Value;
 
             db.Members.Update(member);
@@ -163,18 +162,21 @@ namespace LoyaltyRewardsAPI.Controllers {
         }
 
         [HttpGet("transactions")]
-        public async Task<IActionResult> GetAllTransactions(int memberId) {
+        public async Task<IActionResult> GetTransactions(int memberId) {
 
             Member? member = await db.Members.FindAsync(memberId);
             if (member == null) {
                 return NotFound("No member with that ID found.");
             }
-            List<Transaction> transactions = await db.Transactions.Where(x => x.MemberId == memberId).OrderByDescending(x => x.Date).ToListAsync();
 
-            //int sum = transactions.Sum(x => x.PointsEarned);
-            //member.Points = sum;
-            //db.Update(member);
-            //await db.SaveChangesAsync();
+            await db.Entry(member).Collection(m => m.Transactions).LoadAsync();
+
+            List<PartialTransaction> transactions = new List<PartialTransaction>(member.Transactions.Count);
+
+            foreach (var transaction in member.Transactions.OrderByDescending(x => x.Date)) {
+                transactions.Add(mapper.Map<PartialTransaction>(transaction));
+            }
+
             return Ok(transactions);
         }
     }
