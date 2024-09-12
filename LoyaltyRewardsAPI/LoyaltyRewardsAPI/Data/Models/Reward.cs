@@ -13,4 +13,10 @@ namespace LoyaltyRewardsAPI.Data.Models {
         [Required]
         public int PointCost { get; set; }
     }
+
+    public class PartialReward {
+        public string? Description { get; set; }
+
+        public int? PointCost { get; set; }
+    }
 }

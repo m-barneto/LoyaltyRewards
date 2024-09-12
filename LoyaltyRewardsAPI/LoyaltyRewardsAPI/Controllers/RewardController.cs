@@ -11,12 +11,11 @@ namespace LoyaltyRewardsAPI.Controllers {
         private readonly AppDatabase db;
         private readonly IConfiguration config;
         public RewardController(AppDatabase db, IConfiguration config) { this.db = db; this.config = config; }
-/*
+
         [HttpPost]
         public async Task<IActionResult> CreateReward(int rewardId) {
             return StatusCode(500, "Not implemented.");
         }
-*/
         [HttpGet]
         public async Task<IActionResult> GetReward(int rewardId) {
             return Ok(await db.Rewards.FindAsync(rewardId));
@@ -26,15 +25,14 @@ namespace LoyaltyRewardsAPI.Controllers {
         public async Task<IActionResult> GetAllRewards() {
             return Ok(await db.Rewards.ToListAsync());
         }
-        /*
-                [HttpPatch]
-                public async Task<IActionResult> UpdateReward(int rewardId) {
-                    return StatusCode(500, "Not implemented.");
-                }
+        [HttpPatch]
+        public async Task<IActionResult> UpdateReward(int rewardId) {
+            return StatusCode(500, "Not implemented.");
+        }
 
-                [HttpDelete]
-                public async Task<IActionResult> DeleteReward(int rewardId) {
-                    return StatusCode(500, "Not implemented.");
-                }*/
+        [HttpDelete]
+        public async Task<IActionResult> DeleteReward(int rewardId) {
+            return StatusCode(500, "Not implemented.");
+        }
     }
 }

@@ -2,6 +2,7 @@
 using LoyaltyRewardsAPI.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Metrics;
+using System.Net;
 
 namespace LoyaltyRewardsAPI.Controllers {
     [ApiController]
@@ -20,7 +21,7 @@ namespace LoyaltyRewardsAPI.Controllers {
                 }
 
                 if (member.Points + transaction.PointsEarned < 0) {
-                    return StatusCode(406, "Member doesn't have enough points to redeem.");
+                    return StatusCode(StatusCodes.Status402PaymentRequired, "Member doesn't have enough points to redeem.");
                 }
                 transaction.Member = member;
                 transaction.Date = DateTimeOffset.Now.ToUnixTimeMilliseconds();

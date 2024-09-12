@@ -56,9 +56,12 @@ namespace LoyaltyRewardsAPI.Controllers {
                 return NotFound("No user with that ID found.");
             }
 
-            if (!string.IsNullOrWhiteSpace(updatedMember.FirstName)) member.FirstName = updatedMember.FirstName;
-            if (!string.IsNullOrWhiteSpace(updatedMember.LastName)) member.LastName = updatedMember.LastName;
-            if (!string.IsNullOrWhiteSpace(updatedMember.Email)) member.Email = updatedMember.Email;
+            if (updatedMember.FirstName != null) member.FirstName = updatedMember.FirstName;
+            if (updatedMember.LastName != null) member.LastName = updatedMember.LastName;
+            if (updatedMember.Email != null) member.Email = updatedMember.Email;
+            if (updatedMember.Meta != null) member.Meta = updatedMember.Meta;
+            if (updatedMember.BirthdayMonth != null) member.BirthdayMonth = updatedMember.BirthdayMonth;
+
             if (updatedMember.Points.HasValue) member.Points = updatedMember.Points.Value;
 
             db.Members.Update(member);

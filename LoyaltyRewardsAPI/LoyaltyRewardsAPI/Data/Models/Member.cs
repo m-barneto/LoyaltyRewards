@@ -32,4 +32,20 @@ namespace LoyaltyRewardsAPI.Data.Models {
             return $"{Id} : {Email}\n{AccountCreateTime} - {LastUpdatedTime}";
         }
     }
+
+    public class PartialMember {
+        public string? FirstName { get; set; }
+
+        public string? LastName { get; set; }
+
+        public string? Email { get; set; }
+
+        public string? Meta { get; set; }
+
+        public string? BirthdayMonth { get; set; }
+
+        public int? Points { get; set; }
+
+        public string? Flags { get; set; }
+    }
 }

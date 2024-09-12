@@ -23,9 +23,9 @@ namespace LoyaltyRewardsAPI.Data {
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Member>().HasMany(x => x.Transactions).WithOne(x => x.Member);
+            //modelBuilder.Entity<Member>().HasMany(x => x.Transactions).WithOne(x => x.Member);
             modelBuilder.Entity<Member>().ToTable("Members");
-            modelBuilder.Entity<Transaction>().HasOne(x => x.Member).WithMany().HasForeignKey("MemberId");
+            //modelBuilder.Entity<Transaction>().HasOne(x => x.Member).WithMany().HasForeignKey("MemberId");
             modelBuilder.Entity<Transaction>().ToTable("Transactions");
 
             modelBuilder.Entity<Reward>().ToTable("Rewards");
