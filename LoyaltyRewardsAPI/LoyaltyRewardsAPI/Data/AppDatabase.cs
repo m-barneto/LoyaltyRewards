@@ -66,7 +66,7 @@ namespace LoyaltyRewardsAPI.Data {
 
             HashSet<string> bdays = new HashSet<string>();
 
-            using (TextFieldParser parser = new TextFieldParser(@"C:\Users\Mattdokn\Desktop\customer_balances.csv")) {
+            using (TextFieldParser parser = new TextFieldParser(@"Data\customer_balances.csv")) {
                 parser.TextFieldType = FieldType.Delimited;
                 parser.SetDelimiters(",");
                 while (!parser.EndOfData) {
