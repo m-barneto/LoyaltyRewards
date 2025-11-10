@@ -16,7 +16,6 @@ namespace LoyaltyRewardsAPI.Data {
 
             CreateMap<Transaction, PartialTransaction>()
                 .ForMember(dest => dest.MemberId, opt => opt.MapFrom(src => src.MemberId))
-                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                 .ForMember(dest => dest.PointsEarned, opt => opt.MapFrom(src => src.PointsEarned))
                 .ForMember(dest => dest.Employee, opt => opt.MapFrom(src => src.Employee))
                 .ReverseMap();

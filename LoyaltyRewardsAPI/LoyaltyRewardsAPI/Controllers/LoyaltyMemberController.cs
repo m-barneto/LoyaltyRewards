@@ -4,6 +4,7 @@ using LoyaltyRewardsAPI.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Net;
 
@@ -134,7 +135,6 @@ namespace LoyaltyRewardsAPI.Controllers {
                 matchingMembers.UnionWith(members);
             }
 
-
             if (matchingMembers.Count == 0) {
                 return Ok(new Tuple<int, List<Member>>(0, new List<Member>()));
             }
@@ -144,7 +144,12 @@ namespace LoyaltyRewardsAPI.Controllers {
                 return BadRequest("Page index out of bounds.");
             }
 
-            return Ok(results);
+            List<PartialMember> partialMembers = new List<PartialMember>(results.Item2.Count);
+            foreach (var member in results.Item2) {
+                partialMembers.Add(mapper.Map<PartialMember>(member));
+            }
+
+            return Ok(partialMembers);
         }
 
         [HttpGet("list")]

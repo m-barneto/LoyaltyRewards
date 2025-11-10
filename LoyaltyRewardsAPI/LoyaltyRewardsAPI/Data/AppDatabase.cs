@@ -1,5 +1,6 @@
 ﻿using LoyaltyRewardsAPI.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic.FileIO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -55,6 +56,43 @@ namespace LoyaltyRewardsAPI.Data {
                 new Reward {Id = 4, PointCost = 300, Description = "Latte, Mocha, or Chai"},
             };
             modelBuilder.Entity<Reward>().HasData(rewards);
+
+            ImportCsvData(modelBuilder);
+        }
+
+        void ImportCsvData(ModelBuilder modelBuilder) {
+            List<Member> members = new List<Member>();
+            int i = 5;
+
+            HashSet<string> bdays = new HashSet<string>();
+
+            using (TextFieldParser parser = new TextFieldParser(@"C:\Users\Mattdokn\Desktop\customer_balances.csv")) {
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(",");
+                while (!parser.EndOfData) {
+                    //Process row
+                    string[] fields = parser.ReadFields();
+                    if (fields[0].Contains("DB Timestamp")) continue;
+                    string fname = fields[2];
+                    string lname = fields[3];
+                    string email = fields[6];
+                    string bev = fields[16];
+                    string bday = fields[18];
+                    string concat = fname + lname + email;
+                    if (string.IsNullOrEmpty(concat)) continue;
+                    members.Add(new Member() {
+                        Id = i++,
+                        FirstName = fname,
+                        LastName = lname,
+                        Email = email
+                    });
+                    bdays.Add(bday);
+                }
+            }
+
+
+            modelBuilder.Entity<Member>().HasData(members);
+            Console.WriteLine("reee");
         }
     }
 }
