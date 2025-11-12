@@ -43,6 +43,7 @@ namespace LoyaltyRewardsAPI.Controllers {
             db.Update(member);
             await db.Transactions.AddAsync(transaction);
             await db.SaveChangesAsync();
+
             return Ok(mapper.Map<PartialTransaction>(transaction));
         }
 

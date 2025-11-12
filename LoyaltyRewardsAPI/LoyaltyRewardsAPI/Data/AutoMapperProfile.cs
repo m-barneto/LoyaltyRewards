@@ -19,6 +19,12 @@ namespace LoyaltyRewardsAPI.Data {
                 .ForMember(dest => dest.PointsEarned, opt => opt.MapFrom(src => src.PointsEarned))
                 .ForMember(dest => dest.Employee, opt => opt.MapFrom(src => src.Employee))
                 .ReverseMap();
+
+            CreateMap<Reward, PartialReward>()
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.PointCost, opt => opt.MapFrom(src => src.PointCost))
+                .ReverseMap();
+
         }
     }
 }

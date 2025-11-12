@@ -78,13 +78,19 @@ namespace LoyaltyRewardsAPI.Data {
                     string email = fields[6];
                     string bev = fields[16];
                     string bday = fields[18];
+                    //27
+                    int points;
+                    if (!int.TryParse(fields[27], out points)) {
+                        points = 0;
+                    }
                     string concat = fname + lname + email;
                     if (string.IsNullOrEmpty(concat)) continue;
                     members.Add(new Member() {
                         Id = i++,
                         FirstName = fname,
                         LastName = lname,
-                        Email = email
+                        Email = email,
+                        Points = points
                     });
                     bdays.Add(bday);
                 }
